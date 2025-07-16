@@ -1,0 +1,33 @@
+dataset_source: "mozilla-foundation/common_voice_17_0"
+target_languages:
+  - af
+  - da
+  - ast
+  - te
+  - mk
+  - ml
+audio_format: "wav"
+sample_rate: 16000
+channels: 1
+min_duration_sec: 1
+max_duration_sec: 15
+target_duration_per_accent_sec: 300
+
+train_split_ratio: 0.8
+val_split_ratio: 0.1
+test_split_ratio: 0.1
+
+output_dir: "data"
+
+# enable_data_augmentation: true
+
+# augmentation_params:
+#   enable_speed_perturbation: true
+#   enable_pitch_shift: true
+#   enable_background_noise: true
+#   background_noise_level: 0.005
+
+export_formats:
+  - csv
+  - json
+  - hf
