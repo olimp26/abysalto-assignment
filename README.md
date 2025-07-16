@@ -72,8 +72,28 @@ Include:
 • Limitations of the dataset
 • How your pipeline could scale to support 100+ dialects
 
+I selected huggingface because it had a lot of examples and the downloading process was easy to do with "datasets". The languages i chose are small enough for a quick download and filter, and have multiple dialects (i checked using the dialect_check.py script).
+Dor 6 languages i covered 14 total dialects. By updating config.yaml, its really easy to add language and dialect coverage. When the dataset is downloaded, it's filtered and for the accents available it takes 300 seconds of audio data (or as much as is available).
+
 README.md with:
-• Setup instructions
+• Setup instructions (OK)
 • Overview of your approach
+
+My approach was using huggingface and datasets to download the dataset, then take as many sample audio files so that I have roughly 5 minutes per dialect (6 languages and 14 dialects). after downloading the data using data_download.py, the process_audio script:
+
+Cleans metadata
+Removes invalid/missing/empty samples
+Converts all audio to consistent format (mono WAV, 16 kHz)
+TODO: data augmentation
+Saves all audio in the data/original_data folder ready for test/train/val splitting
+
+Which is done by the create_splits script. quality_checks.py handles:
+Prints basic dataset stats (number of samples, avg duration, distribution per dialect)
+Plots duration histogram
+Verifies label consistency and encoding
+
 • Dataset description and statistics
+Available on the release/data.dump branch, where i uploaded the data folder with everything.
 • Optional improvements, if any
+implement data augmentation and Spectrogram dashboard: Create a Streamlit or Jupyter-based mini-dashboard to browse spec
+trograms and hear samples with their metadata.
