@@ -63,3 +63,17 @@ Suggesting code structure improvements
 Syntax correction and YAML configuration
 
 Planning and partially implementing audio augmentation logic
+
+TODO:
+Explain your decisions via code comments/docstrings and a README.md file.
+Include:
+• What data you selected and why
+• Your dialect coverage
+• Limitations of the dataset
+• How your pipeline could scale to support 100+ dialects
+
+README.md with:
+• Setup instructions
+• Overview of your approach
+• Dataset description and statistics
+• Optional improvements, if any
