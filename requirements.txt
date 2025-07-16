@@ -1,0 +1,11 @@
+datasets==3.6.0
+torchaudio>=2.0
+pandas>=1.5
+tqdm>=4.64
+librosa
+soundfile
+torchcodec
+scikit-learn
+pyyaml
+matplotlib>=3.5
+chardet>=5.0
