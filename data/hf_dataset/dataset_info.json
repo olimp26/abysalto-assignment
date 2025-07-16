@@ -1,0 +1,36 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "language": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "speaker_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "accent": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "audio_path": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "duration_sec": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "is_augmented": {
+      "dtype": "bool",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
