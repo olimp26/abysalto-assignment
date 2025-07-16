@@ -2,98 +2,152 @@
 
 ## Overview
 
-This project processes multilingual speech data from Common Voice for accent classification and related tasks. It includes preprocessing, filtering, augmentation, and metadata generation steps.
+This project provides a complete pipeline for processing multilingual speech data from [Common Voice 17.0](https://commonvoice.mozilla.org/en/datasets), focusing on dialect and accent classification. It includes scripts for downloading, preprocessing, filtering, quality checking, and exporting structured metadata. The pipeline is designed to be modular, reproducible, and easily extensible to more languages and dialects.
 
 ---
 
 ## Setup Instructions
 
-1. Create and activate a virtual environment:
+1. **Create and activate a virtual environment:**
 
 ```bash
 python -m venv venv
 .\venv\Scripts\Activate.ps1  # On Windows
 ```
 
-2. Install dependencies
+2. **Install dependencies:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the run_pipeline.ps1 script # On Windows, on linux you can run in order: download_data.py, preprocess_audio.py, create_splits.py, quality_check.py and export_manifest.py
+3. **Run the pipeline (Windows):**
 
 ```bash
 ./run_pipeline.ps1
 ```
 
-Dataset Description
-Source: Common Voice 17.0
-
-Languages i chose with a few accents and not that many rows: af, da, ast, te, mk, ml
-
-Format: wav
-
-Sample rate: 16kHz
-
-Channels: Mono
-
-Duration constraints: 1s – 15s
-
-Target total duration per accent: 300s
-
-For each language:
-
-Original and augmented samples are stored separately
-
-Metadata includes duration, augmentation flag, and path
-
-(See data/language_dialect_metadata.csv after running the pipeline.)
-
-IMPORTANT: data augmentation was only tried, in the end not fully implemented. Needs some more debugging
+> On Linux, run the scripts in sequence:
+>
+> - `download_data.py`
+> - `preprocess_audio.py`
+> - `create_splits.py`
+> - `quality_check.py`
+> - `export_manifest.py`
 
 ---
 
-LLM assistance via ChatGPT (OpenAI) was used for:
+## Dataset Description
 
-Debugging errors (e.g., resolving soundfile and tensor issues)
+- **Source:** Common Voice 17.0
+- **Languages Selected:** `af`, `da`, `ast`, `te`, `mk`, `ml`
+- **Dialect Coverage:** 14 dialects across 6 languages
+- **Audio Format:** WAV
+- **Sample Rate:** 16kHz
+- **Channels:** Mono
+- **Clip Duration:** 1 to 15 seconds
+- **Target Duration per Dialect:** ~300 seconds (or as much as available)
 
-Suggesting code structure improvements
+Each language's dataset includes:
 
-Syntax correction and YAML configuration
+- Original and (planned) augmented samples in separate folders
+- Cleaned metadata in `data/language_dialect_metadata.csv`:
+  - File path
+  - Duration
+  - Dialect label
+  - Augmentation flag
 
-Planning and partially implementing audio augmentation logic
+> ⚠️ **Note:** Data augmentation is partially implemented but currently disabled due to unresolved bugs.
 
-TODO:
-Explain your decisions via code comments/docstrings and a README.md file.
-Include:
-• What data you selected and why
-• Your dialect coverage
-• Limitations of the dataset
-• How your pipeline could scale to support 100+ dialects
+---
 
-I selected huggingface because it had a lot of examples and the downloading process was easy to do with "datasets". The languages i chose are small enough for a quick download and filter, and have multiple dialects (i checked using the dialect_check.py script).
-Dor 6 languages i covered 14 total dialects. By updating config.yaml, its really easy to add language and dialect coverage. When the dataset is downloaded, it's filtered and for the accents available it takes 300 seconds of audio data (or as much as is available).
+## Pipeline Stages
 
-README.md with:
-• Setup instructions (OK)
-• Overview of your approach
+1. **Data Download (`download_data.py`)**  
+   Uses Hugging Face’s `datasets` library to download filtered speech data for the selected languages and dialects, based on `config.yaml`.
 
-My approach was using huggingface and datasets to download the dataset, then take as many sample audio files so that I have roughly 5 minutes per dialect (6 languages and 14 dialects). after downloading the data using data_download.py, the process_audio script:
+2. **Audio Preprocessing (`preprocess_audio.py`)**
 
-Cleans metadata
-Removes invalid/missing/empty samples
-Converts all audio to consistent format (mono WAV, 16 kHz)
-TODO: data augmentation
-Saves all audio in the data/original_data folder ready for test/train/val splitting
+   - Cleans and validates metadata
+   - Removes invalid, empty, or corrupted samples
+   - Converts all audio to mono WAV format at 16kHz
+   - Saves cleaned audio to `data/original_data/`
+   - Ensures dialect-balanced splits
 
-Which is done by the create_splits script. quality_checks.py handles:
-Prints basic dataset stats (number of samples, avg duration, distribution per dialect)
-Plots duration histogram
-Verifies label consistency and encoding
+3. **Train/Val/Test Splitting (`create_splits.py`)**
 
-• Dataset description and statistics
-Available on the release/data.dump branch, where i uploaded the data folder with everything.
-• Optional improvements, if any
-implement data augmentation and Spectrogram dashboard: Create a Streamlit or Jupyter-based mini-dashboard to browse spec
-trograms and hear samples with their metadata.
+   - Splits dataset into training, validation, and test sets
+   - 80% train, 10% val and 10% test
+
+4. **Quality Checks (`quality_check.py`)**
+
+   - Prints dataset stats (e.g., number of samples, average duration)
+   - Verifies label consistency and encoding
+   - Plots duration histograms
+   - Flags anomalies or inconsistencies
+
+5. **Manifest Generation (`export_manifest.py`)**
+   - Allow exporting the dataset manifest in multiple formats (CSV, JSON, HF compatible Dataset, etc.)
+
+---
+
+## Design Decisions
+
+- **Why Common Voice via Hugging Face?**  
+  Hugging Face's `datasets` library provides streamlined access to Common Voice and flexible filtering by language and accent.
+
+- **Language Selection Criteria:**  
+  Selected for small dataset sizes (to support quick development) and confirmed dialect diversity (using `dialect_check.py`).
+
+- **Target Duration:**  
+  ~5 minutes (300 seconds) per dialect to ensure balanced representation across languages.
+
+---
+
+## Limitations
+
+- Data augmentation is not finalized and currently disabled
+- Not all dialects have full 300s coverage due to data scarcity
+- Only a subset of available languages are supported in this iteration
+- Common Voice labels may vary in consistency across languages
+
+---
+
+## Scalability
+
+The pipeline is built to scale:
+
+- **Adding Languages/Dialects:**  
+  Easily configured via `config.yaml`
+- **Modular Scripts:**  
+  Each stage is standalone and can be parallelized
+- **Future Improvements:**
+  - Add batching, caching, and multiprocessing
+  - Transition to cloud storage for large datasets
+
+---
+
+## Future Improvements
+
+- Finalize and integrate audio augmentation module
+- Add a **Streamlit** or **Jupyter** dashboard to:
+  - Display spectrograms
+  - Play audio samples
+  - Show associated metadata
+- Extend coverage to additional Common Voice languages
+- Include speaker-level metadata for advanced modeling
+
+---
+
+## Acknowledgments
+
+This project uses Mozilla’s Common Voice dataset and Hugging Face’s `datasets` library.  
+Large Language Model (LLM) assistance from OpenAI’s ChatGPT was used for:
+
+- Debugging and fixing Python/audio issues
+- Planning the pipeline architecture
+- Suggesting improvements to code structure and YAML configuration
+- Drafting augmentation logic
+- Helping structure this README.md file
+
+---
